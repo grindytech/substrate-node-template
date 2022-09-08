@@ -2,11 +2,12 @@ use node_template_runtime::{
 	AccountId, AuraConfig, BalancesConfig, GenesisConfig, GrandpaConfig, Signature, SudoConfig,
 	SystemConfig, WASM_BINARY,
 };
-use sc_service::ChainType;
+use sc_service::{ChainType, Properties};
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 use sp_core::{sr25519, Pair, Public};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
 use sp_runtime::traits::{IdentifyAccount, Verify};
+use std::str::FromStr;
 
 // The URL for the telemetry server.
 // const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
@@ -39,9 +40,13 @@ pub fn authority_keys_from_seed(s: &str) -> (AuraId, GrandpaId) {
 pub fn development_config() -> Result<ChainSpec, String> {
 	let wasm_binary = WASM_BINARY.ok_or_else(|| "Development wasm not available".to_string())?;
 
+	let mut props: Properties = Properties::new();
+	props.insert("tokenSymbol".to_string(), "replaceTokenSymbol".into());
+	props.insert("tokenDecimals".to_string(), replaceTokenDecimals.into());
+
 	Ok(ChainSpec::from_genesis(
 		// Name
-		"Development",
+		"replaceTokenName",
 		// ID
 		"dev",
 		ChainType::Development,
@@ -53,12 +58,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
 				// Sudo account
 				get_account_id_from_seed::<sr25519::Public>("Alice"),
 				// Pre-funded accounts
-				vec![
-					get_account_id_from_seed::<sr25519::Public>("Alice"),
-					get_account_id_from_seed::<sr25519::Public>("Bob"),
-					get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
-					get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
-				],
+				vec![sp_runtime::AccountId32::from_str("replaceOwner").unwrap()],
 				true,
 			)
 		},
@@ -70,7 +70,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
 		None,
 		None,
 		// Properties
-		None,
+		Some(props),
 		// Extensions
 		None,
 	))
@@ -138,8 +138,8 @@ fn testnet_genesis(
 			code: wasm_binary.to_vec(),
 		},
 		balances: BalancesConfig {
-			// Configure endowed accounts with initial balance of 1 << 60.
-			balances: endowed_accounts.iter().cloned().map(|k| (k, 1 << 60)).collect(),
+			// Configure endowed accounts with initial balance.
+			balances: endowed_accounts.iter().cloned().map(|k| (k, replaceTotalSupply)).collect(),
 		},
 		aura: AuraConfig {
 			authorities: initial_authorities.iter().map(|x| (x.0.clone())).collect(),

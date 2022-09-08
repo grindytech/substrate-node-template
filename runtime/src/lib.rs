@@ -45,6 +45,7 @@ pub use sp_runtime::{Perbill, Permill};
 
 /// Import the template pallet.
 pub use pallet_template;
+// Import new pallet here
 
 /// An index to a block.
 pub type BlockNumber = u32;
@@ -141,7 +142,7 @@ parameter_types! {
 		::with_sensible_defaults(2 * WEIGHT_PER_SECOND, NORMAL_DISPATCH_RATIO);
 	pub BlockLength: frame_system::limits::BlockLength = frame_system::limits::BlockLength
 		::max_with_normal_ratio(5 * 1024 * 1024, NORMAL_DISPATCH_RATIO);
-	pub const SS58Prefix: u8 = 42;
+	pub const SS58Prefix: u8 = replacePrefix;
 }
 
 // Configure FRAME pallets to include in runtime.
@@ -270,6 +271,8 @@ impl pallet_template::Config for Runtime {
 	type Event = Event;
 }
 
+// Impl new config here
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
 	pub struct Runtime
@@ -288,6 +291,7 @@ construct_runtime!(
 		Sudo: pallet_sudo,
 		// Include the custom logic from the pallet-template in the runtime.
 		TemplateModule: pallet_template,
+		// Construct runtime new pallet here
 	}
 );
 
@@ -333,6 +337,7 @@ mod benches {
 		[pallet_balances, Balances]
 		[pallet_timestamp, Timestamp]
 		[pallet_template, TemplateModule]
+		// Define new pallet benchmark here
 	);
 }
 
